@@ -116,7 +116,6 @@ class SVGD():
     def optimize(self, n_iter, lr=0.01, h=None, display_step=1, lamb=5e-4):
         n, d = self.points.shape
         KL = list()
-        KL_2 = list()
         grad_prob_list = list()
         grad_repulse_list = list()
         grad_tot_list = list()
@@ -149,9 +148,7 @@ class SVGD():
             kde = gaussian_kde(self.points.reshape(-1,))
             mu = kde.evaluate(x_val)
             mu = mu / mu.sum()
-            KL.append(scipy.stats.entropy(mu, density_values))
-
-            KL_2.append(kl_div(self.points))
+            KL.append(kl_div(self.points))
 
             if iter % display_step == 0 or iter == n_iter - 1:
                 print("Iteration", iter, " h =", h_)
@@ -180,10 +177,6 @@ class SVGD():
         plt.plot(range(n_iter), KL_exp, label=r'$\exp{-2t\lambda}KL(\mu_0||\pi)$')
         plt.legend()
         plt.title('Evolution of KL along iterations.')
-        plt.show()
-        plt.plot(range(n_iter), KL_2, label=r'$KL(\mu_t||\pi)$')
-        plt.legend()
-        plt.title('Evolution of KL2 along iterations.')
         plt.show()
         plt.plot(range(n_iter), np.log(KL[0]/KL))
         plt.title(r'ln(KL($\mu_0$||$\pi$)/KL($\mu_t$||$\pi$)) as a function of $t$')

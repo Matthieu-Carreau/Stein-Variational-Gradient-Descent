@@ -18,7 +18,7 @@ def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
     density_values = density_values / density_values.sum()
 
     # Plot the density
-    plt.plot(x_val, density_values)
+    plt.plot(x_val, density_values, label="Target distribution")
     plt.xlabel("X")
     plt.ylabel("Density")
     plt.title(title)
@@ -31,7 +31,7 @@ def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
         kde = gaussian_kde(x.reshape(-1,))
         mu = kde.evaluate(x_val)
         mu = mu / mu.sum()
-        plt.plot(x_val, mu)
+        plt.plot(x_val, mu, label="Current distribution")
 
         if grad_prob is not None:
             grad_plot = grad_prob
@@ -46,6 +46,7 @@ def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
             grad_plot = grad
             plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="red", scale_units="xy", angles="xy", scale=1, width=0.005)
 
+    plt.legend()
     plt.show()
 
 def visu_2d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
