@@ -1,1 +1,1 @@
-# Stein-Variational-Gradiet-Descent
+# Stein-Variational-Gradient-Descent
