@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
-def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
+def visu_1d(target_density, x, grad=None, grad_prob=None, repulse=None,
             x_lim=(-5, 5), n_pts_x=200, title=""):
     """
     Visualization of the target density in 1 dimension, with the particles and their gradients
@@ -14,7 +14,6 @@ def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
 
     # Compute the density
     density_values = target_density(xx)
-    #density_values = density_values.reshape(n_pts_x, 1)
     density_values = density_values / density_values.sum()
 
     # Plot the density
@@ -23,33 +22,31 @@ def visu_1d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
     plt.ylabel("Density")
     plt.title(title)
 
-    if x is not None:
+    # Plot the points
+    plt.scatter(x, np.zeros_like(x), color="black", marker=".")
 
-        # Plot the points
-        plt.scatter(x, np.zeros_like(x), color="black", marker=".")
-
-        kde = gaussian_kde(x.reshape(-1,))
-        mu = kde.evaluate(x_val)
-        mu = mu / mu.sum()
-        plt.plot(x_val, mu, label="Current distribution")
-
-        if grad_prob is not None:
-            grad_plot = grad_prob
-            plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="blue", scale_units="xy", angles="xy", scale=1, width=0.005)
-
-        if repulse is not None:
-            grad_plot = repulse
-            plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="green", scale_units="xy", angles="xy", scale=1, width=0.005)
-
-
-        if grad is not None:
-            grad_plot = grad
-            plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="red", scale_units="xy", angles="xy", scale=1, width=0.005)
+    kde = gaussian_kde(x.reshape(-1,))
+    mu = kde.evaluate(x_val)
+    mu = mu / mu.sum()
+    plt.plot(x_val, mu, label="Current distribution")
 
     plt.legend()
-    plt.show()
 
-def visu_2d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
+    if grad_prob is not None:
+        grad_plot = grad_prob
+        plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="blue", scale_units="xy", angles="xy", scale=1, width=0.005)
+
+    if repulse is not None:
+        grad_plot = repulse
+        plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="green", scale_units="xy", angles="xy", scale=1, width=0.005)
+
+
+    if grad is not None:
+        grad_plot = grad
+        plt.quiver(x.flatten(), np.zeros_like(x), grad_plot.flatten(), np.zeros_like(grad_plot), color="red", scale_units="xy", angles="xy", scale=1, width=0.005)
+
+
+def visu_2d(target_density, x, grad=None, grad_prob=None, repulse=None,
             x_lim=(-5, 5), n_pts_x=101, title=""):
     """
     Visualization of the target density in 2 dimensions, with the particles and their gradients
@@ -85,32 +82,30 @@ def visu_2d(target_density, x=None, grad=None, grad_prob=None, repulse=None,
     plt.title(title)
     plt.colorbar()
 
+    scale = np.diag([(n_pts_x1-1) / (x1_lim[1] - x1_lim[0]), (n_pts_x2-1) / (x2_lim[1] - x2_lim[0])])
+    x_plot = (x -np.array([x1_lim[0], x2_lim[0]])) @ scale
 
-    if x is not None:
-        scale = np.diag([(n_pts_x1-1) / (x1_lim[1] - x1_lim[0]), (n_pts_x2-1) / (x2_lim[1] - x2_lim[0])])
-        x_plot = (x -np.array([x1_lim[0], x2_lim[0]])) @ scale
+    # Plot the gradients
+    if grad_prob is not None:
+        grad_plot = grad_prob @ scale
+        for pt, pt_grad in zip(x_plot, grad_plot):
+            plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="blue", head_width=1, head_length=1)
 
-        # Plot the gradients
-        if grad_prob is not None:
-            grad_plot = grad_prob @ scale
-            for pt, pt_grad in zip(x_plot, grad_plot):
-                plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="blue", head_width=1, head_length=1)
+    if repulse is not None:
+        grad_plot = repulse @ scale
+        for pt, pt_grad in zip(x_plot, grad_plot):
+            plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="green", head_width=1, head_length=1)
 
-        if repulse is not None:
-            grad_plot = repulse @ scale
-            for pt, pt_grad in zip(x_plot, grad_plot):
-                plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="green", head_width=1, head_length=1)
+    if grad is not None:
+        grad_plot = grad @ scale
+        for pt, pt_grad in zip(x_plot, grad_plot):
+            plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="red", head_width=1, head_length=1)
 
-        if grad is not None:
-            grad_plot = grad @ scale
-            for pt, pt_grad in zip(x_plot, grad_plot):
-                plt.arrow(pt[0], pt[1], pt_grad[0], pt_grad[1], color="red", head_width=1, head_length=1)
+    # Plot the points
+    plt.scatter(x_plot[:, 0], x_plot[:, 1], color="teal", marker=".", label="Current distribution")
 
-        # Plot the points
-        plt.scatter(x_plot[:, 0], x_plot[:, 1], color="teal", marker=".")
+    plt.legend()
 
-
-    plt.show()
 
 def visu(target_density, x=None, grad=None, grad_prob=None, repulse=None,
          x_lim=(-5, 5), n_pts_x=101, title=""):

@@ -93,6 +93,7 @@ class MoG():
 
 class CircleDist:
     # Circular shape distribution, width radius R and thickness alpha
+    
     def __init__(self, R=1, alpha=0.1):
         self.R = R
         self.alpha=alpha
