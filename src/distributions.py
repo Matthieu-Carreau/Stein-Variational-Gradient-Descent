@@ -1,6 +1,8 @@
 import numpy as np
 
 class Gaussian():
+    # Multivariate gaussian distribution
+
     def __init__(self, mean=np.zeros(2), cov=np.eye(2)):
         self.mean = mean
         self.cov = cov
@@ -36,9 +38,10 @@ class Gaussian():
         grad = - centered @ self.inv_cov
         return grad
     
-    
+
 class MoG():
-    # Mixture of gaussian
+    # Mixture of multivariate gaussian distributions
+
     def __init__(self, means=[np.zeros(2)], covs=[np.eye(2)], weights=[1]):
         self.means = means
         self.covs = covs
@@ -89,7 +92,7 @@ class MoG():
     
 
 class CircleDist:
-    # Circle of radius R, with linewidth alpha
+    # Circular shape distribution, width radius R and thickness alpha
     def __init__(self, R=1, alpha=0.1):
         self.R = R
         self.alpha=alpha
